@@ -23,6 +23,8 @@ verId = find(ymask ~= 0);
 [yver, xver] = ind2sub(imgsize, verId);
 %[yid, xid] = ind2sub(imgsize, id);
 
+
+
 maxSuperpixelId = max(imseg(:));
 aff = zeros(maxSuperpixelId, maxSuperpixelId);
 weight = zeros(maxSuperpixelId, maxSuperpixelId);
@@ -51,10 +53,10 @@ for i = 1:size(verId)
     % The if statement to ensure we do not count multiple times of a pixel
     % for a pair of superpixel
     %if (x == width || imseg(y + 1, x) ~= imseg(y, x + 1))
-        aff(imseg(y, x), imseg(y + 1, x)) = aff(imseg(y, x), imseg(y + 1, x)) + imedge(y,x) + imedge(y + 1, x);
-        aff(imseg(y + 1, x), imseg(y, x)) = aff(imseg(y, x), imseg(y + 1, x));
-        weight(imseg(y, x), imseg(y + 1, x)) = weight(imseg(y, x), imseg(y + 1, x)) + 1;
-        weight(imseg(y + 1, x), imseg(y, x)) = weight(imseg(y, x), imseg(y + 1, x));
+    aff(imseg(y, x), imseg(y + 1, x)) = aff(imseg(y, x), imseg(y + 1, x)) + imedge(y,x) + imedge(y + 1, x);
+    aff(imseg(y + 1, x), imseg(y, x)) = aff(imseg(y, x), imseg(y + 1, x));
+    weight(imseg(y, x), imseg(y + 1, x)) = weight(imseg(y, x), imseg(y + 1, x)) + 1;
+    weight(imseg(y + 1, x), imseg(y, x)) = weight(imseg(y, x), imseg(y + 1, x));
     %end
 end
 
@@ -65,16 +67,20 @@ aff(1:(maxSuperpixelId+1):end) = 0;
 
 end
 
-function getConvMask (seg, dim)
+function res = getConvMask (seg, dim)
+
 filter = [];
 if (dim == 1)
     % Y Direction
     filter = [-1; 1];
-    seg = 
+    seg = [seg; seg(end, :)];
 else
     % X Direction
     filter = [-1 1];
+    seg = [seg seg(:, end)];
 end
+
+res = conv2(seg, filter, 'valid');
 
 end
 
